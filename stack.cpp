@@ -5,6 +5,8 @@
  *               SUBMIT THIS FILE WITH YOUR MODIFICATIONS
 **/
 
+#include "stack.h"
+#include "__stddef_size_t.h"
 /**
  * Default constructor. Remember to initialize any variables you need
  * and allocate any required memory. The initial size of `items` should
@@ -13,8 +15,12 @@
 template <class T>
 Stack<T>::Stack()
 {
-	// complete your implementation below
-	
+	// create a dynamic array of size DEFAULTCAPACITY
+    // we need set the max-items to capacity
+    // numitems = 0
+    items = new T[DEFAULTCAPACITY];
+    max_items = DEFAULTCAPACITY;
+    num_items = 0;	
 }
 
 /**
@@ -23,8 +29,9 @@ Stack<T>::Stack()
 template <class T>
 Stack<T>::~Stack()
 {
-	// complete your implementation below
-	
+	delete items[];
+    max_items = 0;
+    num_items = 0;
 }
 
 /**
@@ -39,8 +46,19 @@ Stack<T>::~Stack()
 **/
 template <class T>
 void Stack<T>::Push(const T& item) {
-	// complete your implementation below
-	
+	// check if stack is going to be overfilled
+    // if yes we create a new dynamic array with a capacity of max_items * EXPANSIONFACTOR
+    // we copy all the elements from the previous array to this one in order
+    // then we add the new element to the array
+    // if false we add the new element to the array
+    // update max_items(inside the resize function) and num_items in here
+
+    if (num_items + 1 > max_items) {
+        Resize(max_items * EXPANSIONFACTOR);
+    } 
+
+    items[num_items] = item;
+    num_items++;
 }
 
 /**
@@ -56,9 +74,27 @@ void Stack<T>::Push(const T& item) {
 template <class T>
 T Stack<T>::Pop() {
 	// complete your implementation below
-  
-	T item;      // REPLACE THESE LINES
-	return item; // REPLACE THESE LINES
+    // remove the object from the end of the array
+    // subtract num_items by 1;
+    // if num_items < (1.0 / SHRINKRATE) * max_items
+    // if then check that max_items / EXPANSIONFACTOR <= DEFAULTCAPACITY
+    // if this is true then resize to the DEFAULTCAPACITY
+    // otherwise resize to max_items / EXPANSIONFACTOR
+
+    // if the first conditional is not true
+    // do nothing
+
+    num_items--;
+
+    if (num_items < (1.0 / SHRINKRATE) * max_items) {
+        if (max_items / EXPANSIONFACTOR <= DEFAULTCAPACITY) {
+            Resize(DEFAULTCAPACITY);
+        } else {
+            Resize(max_items / EXPANSIONFACTOR);
+        }
+    }
+
+    return items[num_items];
 }
 
 /**
@@ -71,7 +107,7 @@ void Stack<T>::Add(const T& item)
 	// complete your implementation below
 	// Hint: this should call another Stack function
 	//   to add the element to the Stack.
-	
+    Push(item);
 }
 
 /**
@@ -87,8 +123,7 @@ T Stack<T>::Remove()
 	// Hint: this should call another Stack function
 	//   to remove an element from the Stack and return it.
   
-	T item;      // REPLACE THESE LINES
-	return item; // REPLACE THESE LINES
+	return Pop();
 }
 
 /**
@@ -101,10 +136,7 @@ T Stack<T>::Remove()
 **/
 template <class T>
 T Stack<T>::Peek() {
-	// complete your implementation below
-  
-	T item;      // REPLACE THESE LINES
-	return item; // REPLACE THESE LINES
+	return items[num_items - 1];
 }
 
 /**
@@ -114,9 +146,7 @@ T Stack<T>::Peek() {
 **/
 template <class T>
 bool Stack<T>::IsEmpty() const {
-	// complete your implementation below
-  
-	return true; // REPLACE THIS STUB
+	return num_items == 0;
 }
 
 /**
@@ -129,9 +159,7 @@ bool Stack<T>::IsEmpty() const {
 **/
 template <class T>
 size_t Stack<T>::Capacity() const {
-	// complete your implementation below
-  
-	return 0; // REPLACE THIS STUB
+	return max_items;
 }
 
 /**
@@ -140,9 +168,7 @@ size_t Stack<T>::Capacity() const {
 **/
 template <class T>
 size_t Stack<T>::Size() const {
-	/* Add your code below */
-  
-	return 0; // REPLACE THIS STUB
+	return num_items;
 }
 
 /**
@@ -154,6 +180,12 @@ size_t Stack<T>::Size() const {
 **/
 template <class T>
 void Stack<T>::Resize(size_t n) {
-	/* Add your code below */
-	
+    T* newArray = new T[n];
+    for (unsigned int i = 0; i < num_items; i++) {
+        newArray[i] = items[i];
+    }
+
+    delete items[];
+    items = newArray;
+    max_items = n;
 }
