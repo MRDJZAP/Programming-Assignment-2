@@ -10,12 +10,81 @@
 **/
 
 #include "convexhull.h"
+#include <cmath>
 
 /***************************************************
 * IF YOU WISH TO DEFINE YOUR OWN CUSTOM FUNCTIONS, *
 * ADD THEM HERE                                    *
 ***************************************************/
 
+/**
+ * POST: retuns the distance between two points
+ */
+double dist(pair<double, double> p1, pair<double, double> p2) {
+    return sqrt((p1.first - p2.first) * (p1.first - p2.first) + 
+           (p1.second - p2.second) * (p1.second - p2.second));
+}
+
+
+/**
+ * PRE: both points must be in the first quadrant
+ * POST: returns the polar angle between two points
+ */
+double getAngle(pair<double, double> p1, pair<double, double> p2) {
+    // return pi/2 if x values are the same
+    // note (std::atan(1.0) * 4.0) = pi
+    if (p1.first == p2.first) {
+        return (std::atan(1.0) * 4.0) / 2.0;
+    }
+    
+    double aX = p2.first - p1.first;
+    double aY = p2.second - p1.second;
+    double angle = std::atan(aX/aY);
+
+    // convert to polar angle
+    if (angle < 0.0) {
+        return (std::atan(1.0) * 4.0) + angle;
+    }
+
+    return angle;
+}
+
+/**
+ * PRE: i >= 0
+ * POST: returns the index in which points to the smallest angle of the points in v
+ * 
+ * NOTE: does not modify the v
+ */
+int findMinIndex(int index, pair<double, double> refPoint, vector<pair<double, double>>& v) {
+    int minIndex = index;
+    double minAngle = getAngle(refPoint, v[index]);
+
+    for (int i = index + 1; i < v.size(); i++) {
+        double currAngle = getAngle(refPoint, v[i]);
+        if (currAngle < minAngle) {
+            minAngle = currAngle;
+            minIndex = i;
+        }
+    }
+
+    return minIndex;
+}
+
+/**
+ * PRE: v at least contains one element
+ * POST: sorts the vector v in increasing order by the angle with the reference point v[0]
+ */
+void selectionSort(vector<pair<double, double>>& v) {
+    pair<double, double> refPoint = v[0];
+    for (int i = 1; i < v.size() - 1; i++) {
+        int minIndex = findMinIndex(i, refPoint, v);
+
+        // swap
+        pair<double, double> temp = v[i];
+        v[i] = v[minIndex];
+        v[minIndex] = temp;
+    }
+}
 
 
 /**
@@ -25,22 +94,46 @@
  *      If multiple points have the same smallest y-coordinate, v[0]
  *      must contain the one among those with the smallest x-coordinate.
  * 2. The remaining indices i contain the points, sorted in increasing order
- *      by the angle that the point forms with v[0] and the x-axis. THat is,
+ *      by the angle that the point forms with v[0] and the x-axis. That is,
  * 	one of the legs of the angle is represened by the line through v[0] and
  *	v[i], and the other is the x-axis.
  * NOTE: "smallest" y-coordinate is actually closest to the TOP of a PNG image.
 **/
 void SortByAngle(vector<pair<double, double>>& v) {
-	/* Add your code below */
-	
+	// find the point with smallest y-coordinate or x if identical
+    int minIndex = 0;
+    pair<double, double> minPoint = v[0];
+
+    for (unsigned int i = 1; i < v.size(); i++) {
+        if (v[i].second < minPoint.second || (v[i].second == minPoint.second && v[i].first < minPoint.first)) {
+            minPoint = v[i];
+            minIndex = i;
+        } 
+    }    
+    // swap that smallet point with the index 0
+    if (minIndex != 0){
+        pair<double, double> temp = v[0];
+        v[0] = minPoint;
+        v[minIndex] = temp;
+    }
+    // sort starting from index 1 using the helper get angle function to compare angles	
+    selectionSort(v);
 }
 
 /**
  * Determines whether a path from p1 to p2 to p3 describes a counterclockwise turn
 **/
 bool CCW(pair<double, double> p1, pair<double, double> p2, pair<double, double> p3) {
-	/* Replace the line below with your code */
-	return false; // REPLACE THIS STUB
+    double v = p1.first * (p2.second - p3.second) + 
+               p2.first * (p3.second - p1.second) + 
+               p3.first * (p1.second - p2.second);
+
+    // colinear point
+    if (v == 0) {
+        return false;
+    } 
+
+    return v > 0;
 }
 
 /**
@@ -55,7 +148,19 @@ bool CCW(pair<double, double> p1, pair<double, double> p2, pair<double, double> 
 vector<pair<double, double>> GetConvexHull(vector<pair<double, double>>& v) {
 	vector<pair<double, double>> hull;
 
-	/* Add your code below */
+    // // checking for valid hull
+    // if (v.size() < 3) {
+    //     return hull;
+    // }
+
+    // SortByAngle(v);
+
+    // // push the first ref point
+    // hull.push_back(v[0]);
+
+    // // find the convex hull
+
+
 
 
 
