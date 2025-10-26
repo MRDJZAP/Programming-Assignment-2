@@ -148,21 +148,42 @@ bool CCW(pair<double, double> p1, pair<double, double> p2, pair<double, double> 
 vector<pair<double, double>> GetConvexHull(vector<pair<double, double>>& v) {
 	vector<pair<double, double>> hull;
 
-    // // checking for valid hull
-    // if (v.size() < 3) {
-    //     return hull;
-    // }
+    // checking for valid hull
+    if (v.size() < 3) {
+        return hull;
+    }
 
-    // SortByAngle(v);
+    SortByAngle(v);
 
-    // // push the first ref point
-    // hull.push_back(v[0]);
+    // find the convex hull
+    Stack<pair<double, double>> st;
+    // add the two first points
+    st.Push(v[0]);
+    st.Push(v[1]);
 
-    // // find the convex hull
+    for (int i = 2; i < v.size(); i++) {
+        if (st.Size() == 1) { // edge case when we have colinear points at the first iterations 
+            st.Push(v[i]);
+        } else {
+            pair<double, double> c = st.Pop();
+            pair<double, double> p = st.Peek();
+            pair<double, double> n = v[i];
 
-
-
-
-
+            // if they form a left turn
+            if (CCW(p, c, n)) { 
+                st.Push(c);
+                st.Push(n);
+            } else { // a right or colinear
+                i--; // hold the new point;
+            }
+        }
+    }
+    
+    // add all the stack elements to the hull in order
+    hull.resize(st.Size());
+    for (int i = 0; i < hull.size(); i++) {
+        hull[i] = st.Pop();
+    }
+    
 	return hull;
 }
