@@ -37,13 +37,13 @@ double getAngle(pair<double, double> p1, pair<double, double> p2) {
         return (std::atan(1.0) * 4.0) / 2.0;
     }
     
-    double aX = p2.first - p1.first;
-    double aY = p2.second - p1.second;
+    double aX = p2.first - p1.first; // delta X
+    double aY = p2.second - p1.second; // delta Y
     double angle = std::atan(aX/aY);
 
     // convert to polar angle
     if (angle < 0.0) {
-        return (std::atan(1.0) * 4.0) + angle;
+        return (std::atan(1.0) * 4.0) + angle; 
     }
 
     return angle;
@@ -128,11 +128,6 @@ bool CCW(pair<double, double> p1, pair<double, double> p2, pair<double, double> 
                p2.first * (p3.second - p1.second) + 
                p3.first * (p1.second - p2.second);
 
-    // colinear point
-    if (v == 0) {
-        return false;
-    } 
-
     return v > 0;
 }
 
@@ -181,7 +176,7 @@ vector<pair<double, double>> GetConvexHull(vector<pair<double, double>>& v) {
     
     // add all the stack elements to the hull in order
     hull.resize(st.Size());
-    for (int i = 0; i < hull.size(); i++) {
+    for (int i = hull.size() - 1; i <= 0; i--) {
         hull[i] = st.Pop();
     }
     
