@@ -6,7 +6,6 @@
 **/
 
 #include "stack.h"
-#include "__stddef_size_t.h"
 /**
  * Default constructor. Remember to initialize any variables you need
  * and allocate any required memory. The initial size of `items` should
@@ -29,7 +28,7 @@ Stack<T>::Stack()
 template <class T>
 Stack<T>::~Stack()
 {
-	delete items[];
+	delete[] items;
     max_items = 0;
     num_items = 0;
 }
@@ -53,7 +52,7 @@ void Stack<T>::Push(const T& item) {
     // if false we add the new element to the array
     // update max_items(inside the resize function) and num_items in here
 
-    if (num_items + 1 > max_items) {
+    if (num_items == max_items) {
         Resize(max_items * EXPANSIONFACTOR);
     } 
 
@@ -73,28 +72,21 @@ void Stack<T>::Push(const T& item) {
 **/
 template <class T>
 T Stack<T>::Pop() {
-	// complete your implementation below
-    // remove the object from the end of the array
-    // subtract num_items by 1;
-    // if num_items < (1.0 / SHRINKRATE) * max_items
-    // if then check that max_items / EXPANSIONFACTOR <= DEFAULTCAPACITY
-    // if this is true then resize to the DEFAULTCAPACITY
-    // otherwise resize to max_items / EXPANSIONFACTOR
+	
 
-    // if the first conditional is not true
-    // do nothing
-
+    // Save the value before modifying num_items or resizing
+    T value = items[num_items - 1];
     num_items--;
 
-    if (num_items < (1.0 / SHRINKRATE) * max_items) {
-        if (max_items / EXPANSIONFACTOR <= DEFAULTCAPACITY) {
-            Resize(DEFAULTCAPACITY);
-        } else {
-            Resize(max_items / EXPANSIONFACTOR);
-        }
+    if (num_items <= (1.0 / SHRINKRATE) * max_items) {
+        // compute the candidate smaller capacity
+        size_t newCap = max_items / EXPANSIONFACTOR;
+        // ensure we never shrink below DEFAULTCAPACITY
+        if (newCap < DEFAULTCAPACITY) newCap = DEFAULTCAPACITY;
+        Resize(newCap);
     }
 
-    return items[num_items];
+    return value;
 }
 
 /**
@@ -181,11 +173,11 @@ size_t Stack<T>::Size() const {
 template <class T>
 void Stack<T>::Resize(size_t n) {
     T* newArray = new T[n];
-    for (unsigned int i = 0; i < num_items; i++) {
+    for (size_t i = 0; i < num_items; i++) {
         newArray[i] = items[i];
     }
 
-    delete items[];
+    delete[] items;
     items = newArray;
     max_items = n;
 }

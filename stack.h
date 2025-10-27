@@ -13,7 +13,7 @@
 #define SHRINKRATE 4      // When the size of the array is less than this fraction of capacity, the array should resize
 
 #include "orderingstructure.h"
-#include "__stddef_size_t.h"
+#include <cstddef>
 
 template <class T>
 class Stack : public OrderingStructure<T> {
