@@ -152,27 +152,24 @@ vector<pair<double, double>> GetConvexHull(vector<pair<double, double>>& v) {
 
     // find the convex hull
     Stack<pair<double, double>> st;
-    // add the two first points
-    st.Push(v[0]);
-    st.Push(v[1]);
 
-    for (int i = 2; i < v.size(); i++) {
-        if (st.Size() == 1) { // edge case when we have colinear points at the first iterations 
-            st.Push(v[i]);
-        } else {
+    // Process each point to build the hull
+    for (int i = 0; i < (int)v.size(); ++i) {
+
+        // While last two points and current point make a non-left turn, remove the middle one 
+        while (st.Size() > 1) {
             pair<double, double> c = st.Pop();
             pair<double, double> p = st.Peek();
-            pair<double, double> n = v[i];
-
-            // if they form a left turn
-            if (CCW(p, c, n)) { 
+            if (CCW(p, c, v[i])) {
                 st.Push(c);
-                st.Push(n);
-            } else { // a right or colinear
-                i--; // hold the new point;
+                break;
             }
         }
+
+        // Add the current point to the hull
+        st.Push(v[i]);
     }
+
     
     // add all the stack elements to the hull in order
     hull.resize(st.Size());
