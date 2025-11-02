@@ -64,6 +64,13 @@ int findMinIndex(int index, pair<double, double> refPoint, vector<pair<double, d
         if (currAngle < minAngle) {
             minAngle = currAngle;
             minIndex = i;
+        } else if (currAngle == minAngle) {
+            double currDist = dist(refPoint, v[i]);
+            double minDist = dist(refPoint, v[minIndex]);
+            
+            if(currDist < minDist) {
+                minIndex = i;
+            }
         }
     }
 
